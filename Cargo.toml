@@ -1,0 +1,10 @@
+[package]
+name = "thread-control"
+version = "0.1.0"
+readme = "README.md"
+authors = ["Denis Kolodin <deniskolodin@gmail.com>"]
+description = "Rust library to control threads' execution/status."
+repository = "https://github.com/DenisKolodin/thread-control"
+license = "MIT/Apache-2.0"
+
+[dependencies]
