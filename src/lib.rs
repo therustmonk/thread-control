@@ -105,6 +105,7 @@ impl Flag {
 }
 
 /// Struct to control thread execution.
+#[derive(Clone)]
 pub struct Control {
     alive: Weak<AtomicBool>,
     interrupt: Arc<AtomicBool>,
