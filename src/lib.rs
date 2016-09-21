@@ -1,25 +1,69 @@
 //! Library to control thread execution.
+//!
 //! Usage example:
 //!
 //! ```rust
-//! use thread_control::*;
 //! use std::thread;
+//! use thread_control::*;
 //!
 //! fn main() {
 //!     let (flag, control) = make_pair();
-//!     thread::spawn(move || {
+//!     let handle = thread::spawn(move || {
 //!         while flag.alive() {
 //!         }
 //!     });
+//!     assert_eq!(control.is_done(), false);
 //!     control.stop();
+//!     handle.join();
+//!     assert_eq!(control.is_interrupted(), false);
+//!     assert_eq!(control.is_done(), true);
 //! }
 //! ```
+//!
+//! Interrupt example:
+//!
+//! ```rust
+//! use std::thread;
+//! use thread_control::*;
+//!
+//! fn main() {
+//!     let (flag, control) = make_pair();
+//!     let handle = thread::spawn(move || {
+//!         while flag.alive() {
+//!         }
+//!     });
+//!     control.interrupt();
+//!     handle.join();
+//!     assert_eq!(control.is_interrupted(), true);
+//!     assert_eq!(control.is_done(), true);
+//! }
+//! ```
+//!
+//! Panics example:
+//!
+//! ```rust
+//! use std::thread;
+//! use thread_control::*;
+//!
+//! fn main() {
+//!     let (flag, control) = make_pair();
+//!     let handle = thread::spawn(move || {
+//!         while flag.alive() {
+//!             panic!("PANIC!");
+//!         }
+//!     });
+//!     handle.join();
+//!     assert_eq!(control.is_interrupted(), true);
+//!     assert_eq!(control.is_done(), true);
+//! }
+//! ```
+//!
 
 use std::thread;
 use std::sync::{Arc, Weak};
 use std::sync::atomic::{AtomicBool, Ordering};
 
-/// Struct to check execution status for spawned thread.
+/// Struct to check execution status of spawned thread.
 pub struct Flag {
     alive: Arc<AtomicBool>,
     interrupt: Arc<AtomicBool>,
@@ -91,12 +135,10 @@ impl Control {
     }
 }
 
+/// Makes pair with connected flag and control.
 pub fn make_pair() -> (Flag, Control) {
     let flag = Flag::new();
     let control = flag.take_control();
     (flag, control)
 }
 
-#[cfg(test)]
-mod tests {
-}
