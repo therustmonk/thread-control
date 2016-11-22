@@ -63,6 +63,8 @@ use std::thread;
 use std::sync::{Arc, Weak};
 use std::sync::atomic::{AtomicBool, Ordering};
 
+pub mod request;
+
 /// Struct to check execution status of spawned thread.
 pub struct Flag {
     alive: Arc<AtomicBool>,
@@ -142,4 +144,3 @@ pub fn make_pair() -> (Flag, Control) {
     let control = flag.take_control();
     (flag, control)
 }
-
