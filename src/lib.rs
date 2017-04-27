@@ -64,6 +64,7 @@ use std::sync::{Arc, Weak};
 use std::sync::atomic::{AtomicBool, Ordering};
 
 /// Struct to check execution status of spawned thread.
+#[derive(Debug)]
 pub struct Flag {
     alive: Arc<AtomicBool>,
     interrupt: Arc<AtomicBool>,
@@ -112,10 +113,15 @@ impl Flag {
     pub fn is_alive(&self) -> bool {
         (*self.alive).load(Ordering::Relaxed) && !(*self.interrupt).load(Ordering::Relaxed)
     }
+
+    /// Set interrupt flag and drop the instance
+    pub fn interrupt(self) {
+        (self.interrupt).store(true, Ordering::Relaxed)
+    }
 }
 
 /// Struct to control thread execution.
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Control {
     alive: Weak<AtomicBool>,
     interrupt: Arc<AtomicBool>,
