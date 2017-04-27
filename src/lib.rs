@@ -96,11 +96,21 @@ impl Flag {
     }
 
     /// Check the flag isn't stopped or interrupted.
+    ///
+    /// # Panics
+    ///
+    /// This method panics, if interrupt flag was set.
     pub fn alive(&self) -> bool {
         if (*self.interrupt).load(Ordering::Relaxed) {
             panic!("thread interrupted by thread-contol");
         }
         (*self.alive).load(Ordering::Relaxed)
+    }
+
+    /// Check the flag is not stopped and not interrupted
+    /// Use it if panic is not desirable behavior
+    pub fn is_alive(&self) -> bool {
+        (*self.alive).load(Ordering::Relaxed) && !(*self.interrupt).load(Ordering::Relaxed)
     }
 }
 
