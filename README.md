@@ -1,8 +1,9 @@
 # Thread-control library
 
-Missing Rust features to control threads execution.
+Missing Rust execution control tools for **[threads](https://doc.rust-lang.org/std/thread/)**
+and **[futures](https://github.com/alexcrichton/futures-rs)**.
 
-Example:
+## Threads example
 
 ```rust
 use std::thread;
@@ -20,6 +21,29 @@ fn main() {
     assert_eq!(control.is_interrupted(), false);
     assert_eq!(control.is_done(), true);
 }
+```
+
+## Futures example
+
+```rust
+let (flag, control) = thread_control::make_pair();
+
+let duration = Duration::from_secs(5);
+let alive_checker = Interval::new(duration, &handle).unwrap()
+    .and_then(move |value| {
+        if flag.is_alive() {
+            Ok(value)
+        } else {
+            Err(other("stream was interrupted by thread control!"))
+        }
+    });
+
+thread::spawn(move || {
+    // Any routine with `control.is_done()` checking
+});
+
+let managed_routine = alive_checker.select(mystream).for_each(|_| Ok(()));
+core.run(managed_routine).unwrap();
 ```
 
 ## License
